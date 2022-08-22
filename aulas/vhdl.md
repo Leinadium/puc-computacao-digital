@@ -359,3 +359,5 @@ begin
     CLK <= M;
 end architecture;
 ```
+
+Para simular tempo, precisamos especificar quanto tempo demorar as operações
