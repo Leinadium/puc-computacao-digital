@@ -547,7 +547,7 @@ architecture rtl of decode2 is
                 B(i) := '1';
             end if;
         end loop;
-    end funciton;
+    end function;
 
     -- decodifica um sinal de 2 bits
     procedure decode24(
