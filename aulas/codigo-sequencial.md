@@ -80,7 +80,7 @@ end architecture;
 Não tem problema durante síntese (é um circuito, não código),
 mas precisamos resolver o problema de simulação.
 
-### Lista de senstitividade
+### Lista de sensitividade
 
 Um `process` pode definir uma lista de sensitividade, que especifica quando um processo deve rodar. Assim, evita a simulação travar
 
