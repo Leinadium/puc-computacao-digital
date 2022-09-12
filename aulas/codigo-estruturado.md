@@ -10,7 +10,7 @@ VHDL usa a metáfora de uma Placa de Circuito Impresso (PCI), em que vários CIs
 * `entity` --> Encapsulamento do *die*;
 * `component` --> Soquete soldado na PCI;
 
-Um `architecture` que implementa a placa, definindo quais são os soquetes (`components`) e como são interligados com tlirhas (`signals`), é chamado de uma arquitetura estrutural. Precisa fazer:
+Um `architecture` que implementa a placa, definindo quais são os soquetes (`components`) e como são interligados com trilhas (`signals`), é chamado de uma arquitetura estrutural. Precisa fazer:
 
 * *Declaração dos componentes*: Quais portas têm, quais tipos de sinais;
 * *Declaração dos sinais*: Os *nets* da PCI;
