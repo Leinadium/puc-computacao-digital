@@ -28,6 +28,7 @@ begin
 
         if rising_edge(CLOCK) then
             if ENABLE = '1' then    -- modo escrita
+                -- TODO: verificar I/O
                 ram[byte_para_inteiro(ENDERECO)] <= DADO_ENTRADA;
             else                    -- modo leitura
                 DADO_SAIDA <= ram[byte_para_inteiro(ENDERECO)];

@@ -1,0 +1,5 @@
+# não incluindo o script de compilação de assembly
+# pois foi criado pelo professor e não deve ser disponibilizado
+# sem autorizacao
+
+*.py
