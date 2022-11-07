@@ -69,7 +69,7 @@ brcc N  ; if (!carry) pc ← MEM[pc+1] else pc ← pc + 2
 | `add`     | 0101   | RdRr     |
 | `sub`     | 0110   | RdRr     |
 | `cp`      | 0111   | RdRr     |
-| `neq`     | 1000   | Rd00     |
+| `neg`     | 1000   | Rd00     |
 | `not`     | 1000   | Rd01     |
 | `and`     | 1001   | RdRr     |
 | `or`      | 1010   | RdRr     |
