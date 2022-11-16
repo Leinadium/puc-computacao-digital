@@ -7,7 +7,24 @@ package pacote_processador is
 	subtype NibbleT is std_logic_vector(3 downto 0);
 	subtype ByteT   is std_logic_vector(7 downto 0);
 	
+	-- constantes
 	constant TAMANHO_REG: integer := 8;
+	constant QUANTIDADE_REG: integer := 4;
+	
+	constant MODO_READ: std_logic := '0';
+	constant MODO_WRITE: std_logic := '1';
+
+	type TipoLCD is (
+		T_COMANDO, T_CARACTER
+	);
+
+	-- valores especiais de memoria
+	constant END_RESET: ByteT    := "00000000";
+	constant END_PS2: ByteT      := "00010100";
+	constant END_DISPLAY: ByteT  := "00011000";
+	constant END_CARACTER: ByteT := "00011001";
+	constant END_COMANDO: ByteT  := "00011010";
+	constant END_PILHA: ByteT    := "11111111";
 
 	-- instrucoes
 	-- acesso de memoria
@@ -74,6 +91,8 @@ package pacote_processador is
 	function decodifica_instrucao(inst: ByteT) return InstrucaoT;
    
 	function byte_para_inteiro(b: ByteT) return integer;
+	
+	function ident_para_inteiro(i: IdentT) return integer;
 
 end package;
 
@@ -88,6 +107,11 @@ package body pacote_processador is
 	end function;
 	
 	function byte_para_inteiro(b: ByteT) return integer is
+	begin
+		return to_integer(unsigned(b));
+	end function;
+	
+	function ident_para_inteiro(i: Ident) return integer is
 	begin
 		return to_integer(unsigned(b));
 	end function;
