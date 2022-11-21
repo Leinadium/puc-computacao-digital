@@ -7,6 +7,7 @@ entity banco_registros is
 		CLOCK: in std_logic;
 		RD: in IdentT;
 		RR: in IdentT;
+		RZ: in IdentT;
 		Z: in ByteT;
 		ENABLE: in std_logic;
 		A: out ByteT;
@@ -23,7 +24,8 @@ architecture rtl of banco_registros is
 begin
 
 	indice_a <= ident_para_inteiro(RD);
-	indice_b <= indent_para_inteiro(RR);
+	indice_b <= ident_para_inteiro(RR);
+	indice_z <= ident_para_inteiro(RZ);
 
 	A <= registros(indice_a);
 	B <= registros(indice_b);
@@ -32,7 +34,7 @@ begin
 	begin
 		if rising_edge(CLOCK) then
 			if ENABLE = '1' then
-				registros(indice_a) <= Z;	-- salvando no registro
+				registros(indice_z) <= Z;	-- salvando no registro
 			end if;
 		end if;
 	end process;

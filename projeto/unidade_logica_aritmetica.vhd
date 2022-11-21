@@ -8,6 +8,7 @@ entity unidade_logica_aritmetica is
 	port(
 		A: in std_logic_vector(N-1 downto 0);
 		B: in std_logic_vector(N-1 downto 0);
+		CARRY_IN: in std_logic;
 		OPERACAO: in Operacao;
 		
 		Z: out std_logic_vector(N-1 downto 0);
@@ -21,7 +22,7 @@ architecture rtl of unidade_logica_aritmetica is
 	-- registradores de unsigned
 	signal regA, regB: unsigned(N-1 downto 0);
 	-- sinais contendo um bit a mais para as operacoes
-	signal tempA, tempB, tempZ: unsigned(N downto 0);
+	signal tempA, tempB, tempZ, tempFinal: unsigned(N downto 0);
 	-- sinal copia da saida
 	signal saidaZ: std_logic_vector(N-1 downto 0);
 begin
@@ -36,22 +37,28 @@ begin
 		tempZ <=
 			tempA + tempB 									when O_ADD,
 			tempA - tempB 									when O_SUB,
+			0 - tempA										when O_NEG,
 			'0' & not tempA(N-1 downto 0)				when O_NOT,
 			tempA and tempB								when O_AND,
 			tempA or tempB									when O_OR,
 			tempA xor tempB								when O_XOR,
 			tempA(N-1 downto 0) & tempB(0)			when O_SHL,
-			'0' & tempB(0) & tempA(N-1 downto 1)	when O_SHR
+			'0' & tempB(0) & tempA(N-1 downto 1)	when O_SHR,
+			0													when O_XXX
 			;
 			
 	-- saidaZ eh usado para conseguir depois
 	-- reutilizar o valor para o F_ZERO,
 	-- pois Z eh somente escrita, nao leitura
-	saidaZ <= std_logic_vector(tempZ(N-1 downto 0));
+	with CARRY_IN select
+		tempFinal <= tempZ + 1 when '1',
+		tempFinal <= tempZ     when '0';
+	
+	saidaZ <= std_logic_vector(tempFinal(N-1 downto 0));
 	
 	-- saidas
 	Z	<= saidaZ;
-	F_CARRY <= tempZ(N);
+	F_CARRY <= tempFinal(N);
 	F_ZERO <= '1' when saidaZ = zero else '0';
 end rtl;
 

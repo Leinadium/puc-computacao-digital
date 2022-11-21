@@ -10,13 +10,16 @@ package pacote_processador is
 	-- constantes
 	constant TAMANHO_REG: integer := 8;
 	constant QUANTIDADE_REG: integer := 4;
+	constant MAX_REG: integer := 255;
 	
 	constant MODO_READ: std_logic := '0';
 	constant MODO_WRITE: std_logic := '1';
+	
+	constant MULTI_A: std_logic := '0';
+	constant MULTI_B: std_logic := '1';
 
-	type TipoLCD is (
-		T_COMANDO, T_CARACTER
-	);
+	constant	T_COMANDO: std_logic := '0';
+	constant T_CARACTER: std_logic := '1';
 
 	-- valores especiais de memoria
 	constant END_RESET: ByteT    := "00000000";
@@ -28,6 +31,15 @@ package pacote_processador is
 
 	-- instrucoes
 	-- acesso de memoria
+	type CodigoInstrucao is (
+		CI_LDI, CI_PUSH, CI_POP, CI_LD, CI_ST,
+		CI_MOV, CI_INC, CI_DEC, CI_INCC, CI_DECB,
+		CI_ADD, CI_SUB, CI_CP, CI_NEG, CI_NOT, 
+		CI_AND, CI_OR, CI_XOR, CI_TST, CI_LSL, 
+		CI_LSR, CI_ROL, CI_ROR,CI_IJMP, CI_JMP, 
+		CI_BRZ, CI_CRNZ, CI_BRCS, CI_BRCC,
+		CI_UNDEFINED
+	);
 	constant I_LDI:  NibbleT := "0000"; -- [Rd][00]
 	constant I_PUSH: NibbleT := "0000"; -- [Rd][01]
 	constant I_POP:  NibbleT := "0000"; -- [Rd][10]
@@ -58,7 +70,7 @@ package pacote_processador is
 	constant I_JMP:  NibbleT := "1111"; -- [00][00]
 	constant I_BRZ:  NibbleT := "1111"; -- [00][01]
 	constant I_BRNZ: NibbleT := "1111"; -- [00][10]
-	constant I_BRCS: NibbleT := "1111"; -- [00][00]
+	constant I_BRCS: NibbleT := "1111"; -- [00][11]
 	constant I_BRCC: NibbleT := "1111"; -- [01][00]
 	
 	type Operacao is (
@@ -70,8 +82,8 @@ package pacote_processador is
 		-- add:  [Rd, Rr, O_ADD]
 		-- sub:  [Rd, Rr, O_SUB]
 		-- cp:   [Rd, Rr, O_SUB] (sem pulso no execute)
-		-- neg:  [00, Rd, O_SUB] 
-		O_ADD, O_SUB,
+		-- neg:  [Rd, 00, O_NEG] 
+		O_ADD, O_SUB, O_NEG,
 		-- not:  [Rd, 00, O_NOT]
 		-- and:  [Rd, Rr, O_AND]
 		-- or:   [Rd, Rr, O_OR ]
@@ -81,10 +93,11 @@ package pacote_processador is
 		-- lsr:  [Rd, 00, O_SHR]
 		-- rol:  [Rd, c , O_SHL]
 		-- ror:  [Rd, c , O_SHR]
-		O_NOT, O_AND, O_OR, O_XOR, O_SHL, O_SHR
+		O_NOT, O_AND, O_OR, O_XOR, O_SHL, O_SHR,
+		O_XXX	-- operacao invalida
 	);
 	type InstrucaoT is record
-		codigo: NibbleT;
+		codigo: CodigoInstrucao;
 		primeiro, segundo: IdentT; 
 	end record;
 	
@@ -98,11 +111,62 @@ end package;
 
 package body pacote_processador is
 	function decodifica_instrucao(inst: ByteT) return InstrucaoT is
-		variable r: InstrucaoT;
+		variable r: InstrucaoT := inst(7 downto 4);
+		variable x: NibbleT := inst(3 downto 2);
+		variable y, z: IdentT := inst(1 downto 0);
 	begin
-		r.codigo 	:= inst(7 downto 4);
-		r.primeiro 	:= inst(3 downto 2);
-		r.segundo	:= inst(1 downto 0);
+		case x is
+			when "0000" => 
+				case z is
+					when "00" => r := (CI_LDI, y, "00");
+					when "01" => r := (CI_PUSH, y, "00");
+					when "10" => r := (CI_POP, y, "00");
+					when others => r:= (CI_UNDEFINED, "00", "00");
+				end case;
+			when "0001" => r := (CI_LD, y, z);
+			when "0010" => r := (CI_ST, y, z);
+			when "0011" => r := (CI_MOV, y, "00");
+			when "0100" => 
+				case z is
+					when "00" => r := (CI_INC, y, "00");
+					when "01" => r := (CI_DEC, y, "00");
+					when "10" => r := (CI_INCC, y, "00");
+					when "11" => r := (CI_DECB, y, "00");
+				end case;
+			when "0101" => r := (CI_ADD, y, z);
+			when "0110" => r := (CI_SUB, y, z);
+			when "0111" => r := (CI_CP, y, z);
+			when "1000" =>
+				case z is
+					when "00" => r := (CI_NEG, y, "00");
+					when "01" => r := (CI_NOT, y, "00");
+					when others => r:= (CI_UNDEFINED, "00", "00");
+				end case;
+			when "1001" => r := (CI_AND, y, z);
+			when "1010" => r := (CI_OR, y, z);
+			when "1011" => r := (CI_XOR, y, z);
+			when "1100" => r := (CI_TST, y, z);
+			when "1101" =>
+				case z is
+					when "00" => r := (CI_LSL, y, "00");
+					when "01" => r := (CI_LSR, y, "01");
+					when "10" => r := (CI_ROL, y, "00");
+					when "11" => r := (CI_ROR, y, "01");
+				end case;
+			when "1110" => r := (CI_IJMP, y, "00");
+			when "1101" =>
+				case z is
+					when "00" => 
+						case y is 
+							when "00" => r := (CI_JMP, "00", "00");
+							when "01" => r := (CI_BRCC, "00", "00");
+							when others => r:= (CI_UNDEFINED, "00", "00");
+						end case;
+					when "01" => r := (CI_BRZ, "00", "00");
+					when "10" => r := (CI_BRNZ, "00", "00");
+					when "11" => r := (CI_BRCS, "00", "00");
+				end case;
+		end case;
 		return r;
 	end function;
 	
@@ -111,8 +175,8 @@ package body pacote_processador is
 		return to_integer(unsigned(b));
 	end function;
 	
-	function ident_para_inteiro(i: Ident) return integer is
+	function ident_para_inteiro(i: IdentT) return integer is
 	begin
-		return to_integer(unsigned(b));
+		return to_integer(unsigned(i));
 	end function;
 end package body;

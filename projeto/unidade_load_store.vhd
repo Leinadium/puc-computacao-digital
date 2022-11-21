@@ -1,6 +1,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 use work.pacote_processador.ALL;
+
 
 entity unidade_load_store is
 	port (
@@ -11,16 +13,15 @@ entity unidade_load_store is
 		READ_WRITE: in std_logic;
 		ENABLE: in std_logic;
 		DADO_SAIDA: out ByteT;
-		
-		-- io
+		-- i/o
 		PS2_DADO: in ByteT;
 		PS2_VO: in std_logic;
 		NUMERO_7SEG: out ByteT;
 		LCD_DADO: out ByteT;
-		LCD_TIPO: out TipoLCD;
+		LCD_TIPO: out std_logic;
 		LCD_ENABLE: out std_logic
 	);
-end entity;
+end unidade_load_store;
 
 architecture rtl of unidade_load_store is
 
@@ -34,21 +35,28 @@ architecture rtl of unidade_load_store is
 
 begin
 	-- processo de escrever ou ler da memoria
-	process (CLOCK, ENABLE, ENDERECO) is
-	begin
-		-- valores default
-		DADO_SAIDA <= (others => '0');
-		LCD_DADO <= (others => '0');
-		LCD_TIPO <= COMANDO;
-		LCD_ENABLE <= '0';
-		
+	process (CLOCK, ENABLE, ENDERECO, DADO_ENTRADA, reg_ps2, reg_7seg) is
+	begin		
 		if rising_edge(CLOCK) then
+			-- valores default
+			DADO_SAIDA <= (others => '0');
+			LCD_DADO <= (others => '0');
+			LCD_TIPO <= '0';
+			LCD_ENABLE <= '0';
+			next_7seg <= reg_7seg;
+			next_ps2 <= reg_ps2;
+			
+			-- recebimento do teclado
+			if PS2_VO = '1' then
+				next_ps2 <= PS2_DADO;
+			end if;
+			
 			-- modo escrita
-			if ENABLE = '1' then
+			if READ_WRITE = MODO_WRITE and ENABLE = '1' then
 				case ENDERECO is
 					-- verificando se esta escrevendo no 7seg
 					when END_DISPLAY =>
-						reg_7seg <= DADO_ENTRADA;
+						next_7seg <= DADO_ENTRADA;
 					
 					-- verificando se esta escrevendo no lcd
 					when END_CARACTER =>
@@ -90,13 +98,6 @@ begin
 		end if;
 	end process;
 	
-	-- processo para ler o teclado
-	process (CLOCK, PS2_DADO, PS2_VO) is
-	begin
-		if rising_edge(CLOCK) then
-			if PS2_VO = '1' then
-				next_ps2 <= PS2_DADO;
-			end if;
-		end if;
-	end process;
+	-- logica para atualizar o display de 7 seg
+	NUMERO_7SEG <= reg_7seg;
 end architecture;
