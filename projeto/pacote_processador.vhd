@@ -36,8 +36,8 @@ package pacote_processador is
 		CI_MOV, CI_INC, CI_DEC, CI_INCC, CI_DECB,
 		CI_ADD, CI_SUB, CI_CP, CI_NEG, CI_NOT, 
 		CI_AND, CI_OR, CI_XOR, CI_TST, CI_LSL, 
-		CI_LSR, CI_ROL, CI_ROR,CI_IJMP, CI_JMP, 
-		CI_BRZ, CI_CRNZ, CI_BRCS, CI_BRCC,
+		CI_LSR, CI_ROL, CI_ROR, CI_IJMP, CI_JMP, 
+		CI_BRZ, CI_BRNZ, CI_BRCS, CI_BRCC,
 		CI_UNDEFINED
 	);
 	constant I_LDI:  NibbleT := "0000"; -- [Rd][00]
@@ -46,7 +46,7 @@ package pacote_processador is
 	constant I_LD:   NibbleT := "0001"; -- [Rd][Rr]
 	constant I_ST:   NibbleT := "0010"; -- [Rd][Rr]
 	-- aritmetica
-	constant I_MOV:  NibbleT := "0011"; -- [Rd][00]
+	constant I_MOV:  NibbleT := "0011"; -- [Rd][Rr]
 	constant I_INC:  NibbleT := "0100"; -- [Rd][00]
 	constant I_DEC:  NibbleT := "0100"; -- [Rd][01]
 	constant I_INCC: NibbleT := "0100"; -- [Rd][10]
@@ -105,15 +105,18 @@ package pacote_processador is
    
 	function byte_para_inteiro(b: ByteT) return integer;
 	
+	function inteiro_para_byte(int: integer) return ByteT;
+	
 	function ident_para_inteiro(i: IdentT) return integer;
 
 end package;
 
 package body pacote_processador is
 	function decodifica_instrucao(inst: ByteT) return InstrucaoT is
-		variable r: InstrucaoT := inst(7 downto 4);
-		variable x: NibbleT := inst(3 downto 2);
-		variable y, z: IdentT := inst(1 downto 0);
+		variable r: InstrucaoT := (CI_UNDEFINED, "00", "00");
+		variable x: NibbleT := inst(7 downto 4);
+		variable y: IdentT := inst(3 downto 2);
+		variable z: IdentT := inst(1 downto 0);
 	begin
 		case x is
 			when "0000" => 
@@ -125,13 +128,14 @@ package body pacote_processador is
 				end case;
 			when "0001" => r := (CI_LD, y, z);
 			when "0010" => r := (CI_ST, y, z);
-			when "0011" => r := (CI_MOV, y, "00");
+			when "0011" => r := (CI_MOV, y, z);
 			when "0100" => 
 				case z is
 					when "00" => r := (CI_INC, y, "00");
 					when "01" => r := (CI_DEC, y, "00");
 					when "10" => r := (CI_INCC, y, "00");
 					when "11" => r := (CI_DECB, y, "00");
+					when others => r:= (CI_UNDEFINED, "00", "00");
 				end case;
 			when "0101" => r := (CI_ADD, y, z);
 			when "0110" => r := (CI_SUB, y, z);
@@ -152,9 +156,10 @@ package body pacote_processador is
 					when "01" => r := (CI_LSR, y, "01");
 					when "10" => r := (CI_ROL, y, "00");
 					when "11" => r := (CI_ROR, y, "01");
+					when others => r:= (CI_UNDEFINED, "00", "00");
 				end case;
 			when "1110" => r := (CI_IJMP, y, "00");
-			when "1101" =>
+			when "1111" =>
 				case z is
 					when "00" => 
 						case y is 
@@ -165,7 +170,9 @@ package body pacote_processador is
 					when "01" => r := (CI_BRZ, "00", "00");
 					when "10" => r := (CI_BRNZ, "00", "00");
 					when "11" => r := (CI_BRCS, "00", "00");
+					when others => r:= (CI_UNDEFINED, "00", "00");
 				end case;
+			when others => r:= (CI_UNDEFINED, "00", "00");
 		end case;
 		return r;
 	end function;
@@ -174,6 +181,12 @@ package body pacote_processador is
 	begin
 		return to_integer(unsigned(b));
 	end function;
+	
+	function inteiro_para_byte(int: integer) return ByteT is
+	begin
+		return ByteT(to_unsigned(int, TAMANHO_REG));
+	end function;
+	
 	
 	function ident_para_inteiro(i: IdentT) return integer is
 	begin
