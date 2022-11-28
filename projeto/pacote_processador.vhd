@@ -11,6 +11,7 @@ package pacote_processador is
 	constant TAMANHO_REG: integer := 8;
 	constant QUANTIDADE_REG: integer := 4;
 	constant MAX_REG: integer := 255;
+	constant MEM_SIZE: integer := 256;
 	
 	constant MODO_READ: std_logic := '0';
 	constant MODO_WRITE: std_logic := '1';

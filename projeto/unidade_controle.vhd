@@ -32,9 +32,8 @@ end unidade_controle;
 architecture rtl of unidade_controle is
 	-- sinais principais
 	signal pc_atual, pc_prox: integer range 0 to MAX_REG := 0;
-	signal sp_atual, st_prox: integer range 0 to MAX_REG := 0;
+	signal sp_atual, sp_prox: integer range 0 to MEM_SIZE-1 := MEM_SIZE-1;
 	signal cir_atual, cir_prox: ByteT := (others => '0');
-		
 	-- flags
 	signal flag_carry: std_logic := '0';
 	signal flag_zero: std_logic := '0';
@@ -131,12 +130,24 @@ begin
 						MEMORIA_RW <= MODO_WRITE;
 						seletor_endereco <= MULTI_B;     -- utiliza o endereco do registrador
 						
-					when CI_PUSH =>  -- TODO
+					when CI_PUSH =>  -- MEM[sp] <-- Rd, sp <-- sp - 1 
+						MEMORIA_END <= inteiro_para_byte(sp_atual);
+						ident_rd <= instrucao.primeiro;  -- o que vai salvar na mem
+						MEMORIA_RW <= MODO_WRITE;
+						seletor_endereco <= MULTI_A;  -- usa o sp como end
+						sp_prox <= sp_atual - 1;
 						operacao <= O_XXX;
 						
-					when CI_POP =>  -- TODO
+						
+					when CI_POP =>  --  Rd <-- MEM[sp + 1], sp <-- sp + 1
+						ident_rz <= instrucao.primeiro;  -- vai salvar no rd
+						MEMORIA_END <= inteiro_para_byte(sp_atual + 1);
+						MEMORIA_RW <= MODO_READ;
+						seletor_endereco <= MULTI_A; -- usa o sp+1
+						seletor_valor <= MULTI_B;  -- salva o valor da mem
+						sp_prox <= sp_atual + 1;
 						operacao <= O_XXX;
-					--------------------------------------	
+					---------------------------------------
 					-- ### SALTOS ### --
 					when CI_IJMP => -- pc = Rd
 						-- pegando o valor de rd
@@ -356,8 +367,8 @@ begin
 					when CI_LDI => REGISTRO_E <= '1';
 					when CI_LD => REGISTRO_E <= '1';
 					when CI_ST => MEMORIA_E <= '1';
-					-- when CI_PUSH => -- TODO
-					-- when CI_POP => -- TODO
+					when CI_PUSH => MEMORIA_E <= '1';
+					when CI_POP => REGISTRO_E <= '1';
 					
 					-- SALTOS
 					when CI_IJMP => pc_prox <= byte_para_inteiro(ALU_IN);

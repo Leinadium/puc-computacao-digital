@@ -28,7 +28,7 @@ architecture rtl of unidade_load_store is
 	signal reg_ps2, next_ps2: ByteT := (others => '0');
 	signal reg_7seg, next_7seg: ByteT := (others => '0');
 
-	type ramT is array(0 to 255) of ByteT;
+	type ramT is array(0 to MEM_SIZE-1) of ByteT;
 	-- inserir abaixo a declaracao da memoria:
 signal ram: ramT := (
       0 => "11110000", -- simple2.asm: 2:       jmp @main
