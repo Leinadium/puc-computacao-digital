@@ -5,8 +5,14 @@ use work.pacote_processador.ALL;
 entity processador is
 	port(
 		CLK: in std_logic;
-		ENDERECO: out ByteT;
-		Z: out ByteT
+		
+		PS2_CLK: in std_logic;
+		PS2_DATA: in std_logic;
+		
+		SAIDA_J1, SAIDA_J2: out NibbleT;
+		
+		SF_D: out NibbleT;
+		LCD_E, LCD_RS, LCD_RW: out std_logic
 	);
 end processador;
 
@@ -80,6 +86,38 @@ architecture structural of processador is
 		);
 	end component;
 	
+	component io_displayseg_exibicao is
+		port(
+			CLOCK: in std_logic;
+			NUMERO: in ByteT;
+			SAIDA_J1, SAIDA_J2: out NibbleT
+		);
+	end component;
+	
+	component io_ps2_driver is
+		port (
+			CLOCK: in std_logic;
+			PS2_CLK: in std_logic;
+			PS2_DATA: in std_logic;
+			CHAR: out ByteT;
+			VO: out std_logic
+		);
+	end component;
+	
+	component io_lcd_escrever is
+		port(
+			CLOCK: in std_logic;
+			VI: in std_logic;
+			BYTE_IN: in std_logic_vector (7 downto 0);
+			TIPO_IN: in std_logic;
+			
+			SF_D: out std_logic_vector(3 downto 0);
+			LCD_E: out std_logic; 
+			LCD_RS: out std_logic; 
+			LCD_RW: out std_logic
+		);
+	end component;
+	
 	signal memoria_controle_saida: ByteT;
 	signal controle_memoria_rw: std_logic;
 	signal controle_memoria_enable: std_logic;
@@ -102,16 +140,14 @@ architecture structural of processador is
 	signal multiplexador_operador_z: ByteT;
 	signal multiplexador_endereco_z: ByteT;
 	
-	signal memoria_numero_7seg: ByteT := "00000000";
-	signal memoria_lcd_dado: ByteT := "00000000";
-	signal memoria_lcd_tipo: std_logic := '0';
-	signal memoria_lcd_enable: std_logic := '0';
+	signal ps2_memoria_dado: ByteT;
+	signal ps2_memoria_vo: std_logic;
+	signal memoria_numero_7seg: ByteT;
+	signal memoria_lcd_dado: ByteT;
+	signal memoria_lcd_tipo: std_logic;
+	signal memoria_lcd_enable: std_logic;
 	
 begin
-
-	ENDERECO <= multiplexador_endereco_z;
-	Z <= multiplexador_valor_z;
-
 	inst_unidade_controle: unidade_controle port map (
 		ClOCK => CLK,
 		MEMORIA_IN => memoria_controle_saida,
@@ -154,8 +190,8 @@ begin
 	
 	inst_unidade_load_store: unidade_load_store port map (
 		CLOCK => CLK,
-		PS2_VO => '0',
-		PS2_DADO => "00000000",
+		PS2_VO => ps2_memoria_vo,
+		PS2_DADO => ps2_memoria_dado,
 		READ_WRITE => controle_memoria_rw,
 		ENABLE => controle_memoria_enable,
 		ENDERECO => multiplexador_endereco_z,
@@ -186,6 +222,32 @@ begin
 		B => controle_multiplexador_operador_imm,
 		S => controle_multiplexador_operador_select,
 		Z => multiplexador_operador_z
+	);
+	
+	inst_io_displayseg_exibicao: io_displayseg_exibicao port map (
+		CLOCK => CLK,
+		NUMERO => memoria_numero_7seg,
+		SAIDA_J1 => SAIDA_J1, 
+		SAIDA_J2 => SAIDA_J2
+	);
+	
+	inst_io_ps2_driver: io_ps2_driver port map (
+		CLOCK => CLK,
+		PS2_CLK => PS2_CLK,
+		PS2_DATA => PS2_DATA,
+		CHAR => ps2_memoria_dado,
+		VO => ps2_memoria_vo
+	);
+	
+	inst_io_lcd_escrever: io_lcd_escrever port map (
+		CLOCK => CLK,
+		VI => memoria_lcd_enable,
+		BYTE_IN => memoria_lcd_dado,
+		TIPO_IN => memoria_lcd_tipo,
+		SF_D => SF_D,
+		LCD_E => LCD_E,
+		LCD_RS => LCD_RS, 
+		LCD_RW => LCD_RW
 	);
 
 end structural;

@@ -1,14 +1,19 @@
-      .org 0x00
+; reset vector
+     .org 0x00
       jmp @main
 
+; start of text
       .org 0x20
-main: ldi  r0, 0x01
+
+main: 
+      ldi  r0, 0x01
       ldi  r1, 0x00
-      ldi  r3, 0x32
+      ; preparando endereco de store (display7seg)
+      ldi  r3, 0x18
 
-
-loop: mov  r2, r0
-      add  r0, r1
-      mov  r1, r2
-      st   r0, [r3]
-      jmp  @loop
+; fibonnaci usando pilha
+loop: push r0
+      add r0, r1
+      pop r1
+      st  r0, [r3]
+      jmp @loop 

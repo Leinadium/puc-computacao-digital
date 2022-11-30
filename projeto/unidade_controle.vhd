@@ -70,6 +70,7 @@ begin
 		if rising_edge(CLOCK) then
 			estado_atual <= estado_prox;
 			pc_atual <= pc_prox;
+			sp_atual <= sp_prox;
 			cir_atual <= cir_prox;
 		end if;
 	end process;

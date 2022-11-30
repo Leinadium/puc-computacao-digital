@@ -41,38 +41,6 @@ package pacote_processador is
 		CI_BRZ, CI_BRNZ, CI_BRCS, CI_BRCC,
 		CI_UNDEFINED
 	);
-	constant I_LDI:  NibbleT := "0000"; -- [Rd][00]
-	constant I_PUSH: NibbleT := "0000"; -- [Rd][01]
-	constant I_POP:  NibbleT := "0000"; -- [Rd][10]
-	constant I_LD:   NibbleT := "0001"; -- [Rd][Rr]
-	constant I_ST:   NibbleT := "0010"; -- [Rd][Rr]
-	-- aritmetica
-	constant I_MOV:  NibbleT := "0011"; -- [Rd][Rr]
-	constant I_INC:  NibbleT := "0100"; -- [Rd][00]
-	constant I_DEC:  NibbleT := "0100"; -- [Rd][01]
-	constant I_INCC: NibbleT := "0100"; -- [Rd][10]
-	constant I_DECB: NibbleT := "0100"; -- [Rd][11]
-	constant I_ADD:  NibbleT := "0101"; -- [Rd][Rr]
-	constant I_SUB:  NibbleT := "0110"; -- [Rd][Rr]
-	constant I_CP:   NibbleT := "0111"; -- [Rd][Rr]
-	constant I_NEG:  NibbleT := "1000"; -- [Rd][00]
-	-- logica
-	constant I_NOT:  NibbleT := "1000"; -- [Rd][01]
-	constant I_AND:  NibbleT := "1001"; -- [Rd][Rr]
-	constant I_OR:   NibbleT := "1010"; -- [Rd][Rr]
-	constant I_XOR:  NibbleT := "1011"; -- [Rd][Rr]
-	constant I_TST:  NibbleT := "1100"; -- [Rd][Rr]
-	constant I_LSL:  NibbleT := "1101"; -- [Rd][00]
-	constant I_LSR:  NibbleT := "1101"; -- [Rd][01]
-	constant I_ROL:  NibbleT := "1101"; -- [Rd][10]
-	constant I_ROR:  NibbleT := "1101"; -- [Rd][11]
-	-- saltos
-	constant I_IJMP: NibbleT := "1110"; -- [Rd][00]
-	constant I_JMP:  NibbleT := "1111"; -- [00][00]
-	constant I_BRZ:  NibbleT := "1111"; -- [00][01]
-	constant I_BRNZ: NibbleT := "1111"; -- [00][10]
-	constant I_BRCS: NibbleT := "1111"; -- [00][11]
-	constant I_BRCC: NibbleT := "1111"; -- [01][00]
 	
 	type Operacao is (
 		-- mov:  [Rd, 00, O_ADD]
@@ -109,6 +77,8 @@ package pacote_processador is
 	function inteiro_para_byte(int: integer) return ByteT;
 	
 	function ident_para_inteiro(i: IdentT) return integer;
+	
+	function hex2ssd(hex: NibbleT) return std_logic_vector;
 
 end package;
 
@@ -188,9 +158,33 @@ package body pacote_processador is
 		return ByteT(to_unsigned(int, TAMANHO_REG));
 	end function;
 	
-	
 	function ident_para_inteiro(i: IdentT) return integer is
 	begin
 		return to_integer(unsigned(i));
 	end function;
+
+	function hex2ssd(HEX: NibbleT) return std_logic_vector is
+		variable R: std_logic_vector(6 downto 0) := (others => '0');
+	begin
+		case HEX is
+			when "0000" => R := "0111111";
+			when "0001" => R := "0000110";
+			when "0010" => R := "1011011";
+			when "0011" => R := "1001111";
+			when "0100" => R := "1100110";
+			when "0101" => R := "1101101";
+			when "0110" => R := "1111101";
+			when "0111" => R := "0000111";
+			when "1000" => R := "1111111";
+			when "1001" => R := "1100111";
+			when "1010" => R := "1110111";
+			when "1011" => R := "1111100";
+			when "1100" => R := "0111001";
+			when "1101" => R := "1011110";
+			when "1110" => R := "1111001";
+			when others => R := "1110001";
+		end case;
+		return R;
+	end function;
+	
 end package body;
