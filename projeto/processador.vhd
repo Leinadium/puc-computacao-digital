@@ -4,7 +4,7 @@ use work.pacote_processador.ALL;
 
 entity processador is
 	port(
-		CLK: in std_logic;
+		CLK_50MHZ: in std_logic;
 		
 		PS2_CLK: in std_logic;
 		PS2_DATA: in std_logic;
@@ -19,6 +19,9 @@ end processador;
 architecture structural of processador is
 	component unidade_controle is
 		port(
+		
+			VAZA_END: out ByteT;
+		
 			CLOCK: in std_logic;
 			MEMORIA_END: out ByteT;     -- endereco do dado
 			MEMORIA_RW: out std_logic;  -- modo leitura ou escrita
@@ -74,7 +77,8 @@ architecture structural of processador is
 			NUMERO_7SEG: out ByteT;
 			LCD_DADO: out ByteT;
 			LCD_TIPO: out std_logic;
-			LCD_ENABLE: out std_logic
+			LCD_ENABLE: out std_logic;
+			LCD_READY: in std_logic
 		);
 	end component;
 	
@@ -99,7 +103,7 @@ architecture structural of processador is
 			CLOCK: in std_logic;
 			PS2_CLK: in std_logic;
 			PS2_DATA: in std_logic;
-			CHAR: out ByteT;
+			ASCII: out ByteT;
 			VO: out std_logic
 		);
 	end component;
@@ -114,9 +118,19 @@ architecture structural of processador is
 			SF_D: out std_logic_vector(3 downto 0);
 			LCD_E: out std_logic; 
 			LCD_RS: out std_logic; 
-			LCD_RW: out std_logic
+			LCD_RW: out std_logic;
+			READY: out std_logic
 		);
 	end component;
+	
+	component divisor is
+		port (
+			CLOCK_IN: in std_logic;
+			CLOCK_OUT: out std_logic
+		);
+	end component;
+	
+	signal CLK: std_logic;
 	
 	signal memoria_controle_saida: ByteT;
 	signal controle_memoria_rw: std_logic;
@@ -146,9 +160,19 @@ architecture structural of processador is
 	signal memoria_lcd_dado: ByteT;
 	signal memoria_lcd_tipo: std_logic;
 	signal memoria_lcd_enable: std_logic;
+	signal lcd_memoria_ready: std_logic;
 	
 begin
+	-- inst_divisor: divisor port map(
+	--	CLOCK_IN => CLK_50MHZ,
+	--	CLOCK_OUT => CLK
+	--);
+	CLK <= CLK_50MHZ;
+
 	inst_unidade_controle: unidade_controle port map (
+		
+		-- VAZA_END => memoria_numero_7seg,
+	
 		ClOCK => CLK,
 		MEMORIA_IN => memoria_controle_saida,
 		MEMORIA_RW => controle_memoria_rw,
@@ -200,7 +224,8 @@ begin
 		NUMERO_7SEG => memoria_numero_7seg,
 		LCD_DADO => memoria_lcd_dado,
 		LCD_TIPO => memoria_lcd_tipo,
-		LCD_ENABLE => memoria_lcd_enable
+		LCD_ENABLE => memoria_lcd_enable,
+		LCD_READY => lcd_memoria_ready
 	);
 	
 	inst_multiplexador_valor: multiplexador port map (
@@ -225,7 +250,7 @@ begin
 	);
 	
 	inst_io_displayseg_exibicao: io_displayseg_exibicao port map (
-		CLOCK => CLK,
+		CLOCK => CLK_50MHZ,
 		NUMERO => memoria_numero_7seg,
 		SAIDA_J1 => SAIDA_J1, 
 		SAIDA_J2 => SAIDA_J2
@@ -235,7 +260,7 @@ begin
 		CLOCK => CLK,
 		PS2_CLK => PS2_CLK,
 		PS2_DATA => PS2_DATA,
-		CHAR => ps2_memoria_dado,
+		ASCII => ps2_memoria_dado,
 		VO => ps2_memoria_vo
 	);
 	
@@ -247,7 +272,8 @@ begin
 		SF_D => SF_D,
 		LCD_E => LCD_E,
 		LCD_RS => LCD_RS, 
-		LCD_RW => LCD_RW
+		LCD_RW => LCD_RW,
+		READY => lcd_memoria_ready
 	);
 
 end structural;

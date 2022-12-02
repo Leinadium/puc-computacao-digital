@@ -5,6 +5,9 @@ use work.pacote_processador.ALL;
 
 entity unidade_controle is
 	port(
+	
+		VAZA_END: out ByteT;
+	
 		CLOCK: in std_logic;
 		-- unidade load/store
 		MEMORIA_END: out ByteT;     -- endereco do dado
@@ -93,6 +96,7 @@ begin
 				MEMORIA_END <= inteiro_para_byte(pc_atual);   -- endereco
 				seletor_endereco <= MULTI_A;      -- usa o endereco acima
 				MEMORIA_RW <= MODO_READ;          -- modo leitura
+				MEMORIA_E <= '1';
 				estado_prox <= Fetch2;            -- proximo estado
 			
 			when Fetch2 =>
@@ -110,6 +114,7 @@ begin
 					-- ### MEMORIA ### --
 					when CI_LDI =>  -- Rd = MEM[pc + 1],  pc += 2
 						MEMORIA_END <= inteiro_para_byte(pc_atual);
+						MEMORIA_E <= '1';
 						MEMORIA_RW <= MODO_READ;
 						seletor_endereco <= MULTI_A;     -- utiliza o valor fornecido
 						seletor_valor <= MULTI_B;
@@ -122,6 +127,7 @@ begin
 						ident_rr <= instrucao.segundo;	-- endereco para memoria
 						ident_rz <= instrucao.primeiro;
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_B;     -- utiliza o valor do registrador
 						seletor_valor <= MULTI_B;
 						
@@ -144,6 +150,7 @@ begin
 						ident_rz <= instrucao.primeiro;  -- vai salvar no rd
 						MEMORIA_END <= inteiro_para_byte(sp_atual + 1);
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A; -- usa o sp+1
 						seletor_valor <= MULTI_B;  -- salva o valor da mem
 						sp_prox <= sp_atual + 1;
@@ -160,26 +167,31 @@ begin
 					when CI_JMP =>  -- pc = MEM[pc+1]
 						MEMORIA_END <= ByteT(to_unsigned(pc_atual, TAMANHO_REG));
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A;     -- utilza o valor fornecido
 						
 					when CI_BRZ => 
 						MEMORIA_END <= ByteT(to_unsigned(pc_atual, TAMANHO_REG));
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A;     -- utiliza o valor fornecido
 					
 					when CI_BRNZ => 
 						MEMORIA_END <= ByteT(to_unsigned(pc_atual, TAMANHO_REG));
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A;     -- utiliza o valor fornecido
 					
 					when CI_BRCS => 
 						MEMORIA_END <= ByteT(to_unsigned(pc_atual, TAMANHO_REG));
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A;     -- utiliza o valor fornecido
 					
 					when CI_BRCC => 
 						MEMORIA_END <= ByteT(to_unsigned(pc_atual, TAMANHO_REG));
 						MEMORIA_RW <= MODO_READ;
+						MEMORIA_E <= '1';
 						seletor_endereco <= MULTI_A;     -- utiliza o valor fornecido
 					--------------------------------------
 					-- ### OPERACOES ## --
@@ -425,5 +437,9 @@ begin
 				estado_prox <= Fetch1; -- proximo estado
 		end case;
 	end process;
+	
+	
+	VAZA_END <= inteiro_para_byte(pc_atual);
+	
 end rtl;
 

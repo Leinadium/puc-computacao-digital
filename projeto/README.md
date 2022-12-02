@@ -101,4 +101,32 @@ No endereço `0x00` (*reset vector*) então precisa ter um **jmp** para o ínici
 | `0x1A`   | Comando a ser mandado para o LCD           |
 | `0xff`   | Início da pilha                            |
 
-O registro do teclado volta para 0 ao ler o valor. Os registros do LCD voltam para 0 ao terminar de mandar.
+O registro do teclado volta para 0 ao ler o valor. Os registros do LCD voltam para 0 ao terminar de mandar
+
+## Teclado
+
+As teclas do teclado pressionadas serão convertidas para o simbolo correspondente da tabela ASCII.
+
+A tabela abaixo também informa qual o código exato que chega pelo PS2, e qual o código do símbolo para ser
+enviado para o LCD.
+
+| Tecla     | PS2  | LCD  | ASCII |
+|-----------|------|------|-------|
+| 0         | 0x45 | 0x30 | 0x30  |
+| 1         | 0x16 | 0x31 | 0x31  |
+| 2         | 0x1E | 0x32 | 0x32  |
+| 3         | 0x26 | 0x33 | 0x33  |
+| 4         | 0x25 | 0x34 | 0x34  |
+| 5         | 0x2E | 0x35 | 0x35  |
+| 6         | 0x36 | 0x36 | 0x36  |
+| 7         | 0x3D | 0x37 | 0x37  |
+| 8         | 0x3E | 0x38 | 0x38  |
+| 9         | 0x46 | 0x39 | 0x39  |
+| +         | 0x55 | 0x2B | 0x2B  |
+| -         | 0x4E | 0x2D | 0x2D  |
+| x (letra) | 0x22 | 0x78 | 0x78  |
+| /         | 0x4A | ---- | 0x2F  |
+| ENTER     | 0x5A | ---- | 0x0A  |
+| =         | ---- | 0x3D | 0x3D  |
+| BACKSPACE | 0x66 | ---- | 0x08  |
+| ÷         | ---- | 0xFD | ----  |

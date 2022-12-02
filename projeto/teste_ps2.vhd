@@ -8,22 +8,28 @@ ARCHITECTURE behavior OF teste_ps2 IS
   
 	COMPONENT processador
 	PORT(
-		CLK : IN  std_logic;
+		CLK_50MHZ : IN  std_logic;
 		PS2_CLK : IN  std_logic;
 		PS2_DATA : IN  std_logic;
 		SAIDA_J1 : OUT  std_logic_vector(3 downto 0);
-		SAIDA_J2 : OUT  std_logic_vector(3 downto 0)
+		SAIDA_J2 : OUT  std_logic_vector(3 downto 0);
+		
+		SF_D: out std_logic_vector(3 downto 0);
+		LCD_E, LCD_RS, LCD_RW: out std_logic
+		
 	  );
 	END COMPONENT;
 
    --Inputs
-   signal CLK : std_logic := '0';
+   signal CLK_50MHZ : std_logic := '0';
    signal PS2_CLK : std_logic := '0';
    signal PS2_DATA : std_logic := '0';
 
  	--Outputs
    signal SAIDA_J1 : std_logic_vector(3 downto 0);
    signal SAIDA_J2 : std_logic_vector(3 downto 0);
+	signal SF_D: std_logic_vector(3 downto 0);
+	signal LCD_E, LCD_RS, LCD_RW: std_logic;
 
    -- Clock period definitions
    constant CLK_period : time := 20 ns;
@@ -31,10 +37,10 @@ ARCHITECTURE behavior OF teste_ps2 IS
 	
 	type DataT is array (0 to 11) of std_logic_vector(7 downto 0);
 	constant DATA : DataT := (
-		"00101010", "11110000", "00101010", -- "V" + 0xF0 + "V"
-		"00110011", "11110000", "00110011", -- "H" + 0xF0 + "V"
-		"00100011", "11110000", "00100011", -- "D" + 0xF0 + "V"
-		"01001011", "11110000", "01001011"  -- "L" + 0xF0 + "V"
+		x"45", "11110000", x"45", -- "0" + 0xF0 + "0"
+		x"16", "11110000", x"16", -- "1" + 0xF0 + "1"
+		x"1E", "11110000", x"1E", -- "2" + 0xF0 + "2"
+		x"26", "11110000", x"26"  -- "3" + 0xF0 + "3"
 	);
 
 	procedure ps2_bit (B : in std_logic ;
@@ -52,19 +58,23 @@ BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: processador PORT MAP (
-          CLK => CLK,
+          CLK_50MHZ => CLK_50MHZ,
           PS2_CLK => PS2_CLK,
           PS2_DATA => PS2_DATA,
           SAIDA_J1 => SAIDA_J1,
-          SAIDA_J2 => SAIDA_J2
+          SAIDA_J2 => SAIDA_J2,
+			 SF_D => SF_D,
+			 LCD_E => LCD_E,
+			 LCD_RS => LCD_RS,
+			 LCD_RW => LCD_RW
         );
 
    -- Clock process definitions
    CLK_process :process
    begin
-		CLK <= '0';
+		CLK_50MHZ <= '0';
 		wait for CLK_period/2;
-		CLK <= '1';
+		CLK_50MHZ <= '1';
 		wait for CLK_period/2;
    end process;
 	
@@ -75,7 +85,7 @@ BEGIN
       wait for 100 ns;	
 
 		-- esperando o lcd se configurar
-		-- wait for 40 ms;
+		wait for 30 ms;
       
 		wait for CLK_period*20;
 

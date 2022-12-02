@@ -29,7 +29,7 @@ package pacote_processador is
 	constant END_CARACTER: ByteT := "00011001";
 	constant END_COMANDO: ByteT  := "00011010";
 	constant END_PILHA: ByteT    := "11111111";
-
+	
 	-- instrucoes
 	-- acesso de memoria
 	type CodigoInstrucao is (

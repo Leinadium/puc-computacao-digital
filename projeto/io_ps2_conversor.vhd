@@ -4,42 +4,33 @@ use ieee.numeric_std.all;
 
 entity io_ps2_conversor is
 	port (
-		SCAN: in std_logic_vector (7 downto 0);
-		CHAR: out std_logic_vector (7 downto 0)
+		PS2_CODE: in std_logic_vector (7 downto 0);
+		ASCII: out std_logic_vector (7 downto 0)
 	);
 end entity ;
 architecture rtl of io_ps2_conversor is
 	type MemoryT is array (0 to 255) of std_logic_vector (7 downto 0);
 	signal MEM : MemoryT := (
-		16#1C# => x"61", --a
-		16#32# => x"62", --b
-		16#21# => x"63", --c
-		16#23# => x"64", --d
-		16#24# => x"65", --e
-		16#2B# => x"66", --f
-		16#34# => x"67", --g
-		16#33# => x"68", --h
-		16#43# => x"69", --i
-		16#3B# => x"6A", --j
-		16#42# => x"6B", --k
-		16#4B# => x"6C", --l
-		16#3A# => x"6D", --m
-		16#31# => x"6E", --n
-		16#44# => x"6F", --o
-		16#4D# => x"70", --p
-		16#15# => x"71", --q
-		16#2D# => x"72", --r
-		16#1B# => x"73", --s
-		16#2C# => x"74", --t
-		16#3C# => x"75", --u
-		16#2A# => x"76", --v
-		16#1D# => x"77", --w
-		16#22# => x"78", --x
-		16#35# => x"79", --y
-		16#1A# => x"7A", --z
-		-- others => ( others => 'U' )
-		others => x"61" -- para teste
+		-- https://docs.xilinx.com/v/u/en-US/ug230, pagina 65
+		-- https://www.asciitable.com/
+		16#45# => x"30", -- 0
+		16#16# => x"31", -- 1
+		16#1E# => x"32", -- 2
+		16#26# => x"33", -- 3
+		16#25# => x"34", -- 4
+		16#2E# => x"35", -- 5
+		16#36# => x"36", -- 6
+		16#3D# => x"37", -- 7
+		16#3E# => x"38", -- 8
+		16#46# => x"39", -- 9
+		16#55# => x"2B", -- +
+		16#4E# => x"2D", -- -
+		16#22# => x"78", -- x (letra)
+		16#4A# => x"2F", -- /
+		16#5A# => x"0A", -- ENTER
+		16#66# => x"08", -- BACKSPACE 
+		others => x"6C"  -- [-] para teste
 	);
 begin
-	CHAR <= MEM (to_integer(unsigned(SCAN)));
+	ASCII <= MEM (to_integer(unsigned(PS2_CODE)));
 end architecture ;

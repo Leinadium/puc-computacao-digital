@@ -13,7 +13,8 @@ entity io_lcd_escrever is
 		SF_D: out std_logic_vector(3 downto 0); -- nibble saida			
 		LCD_E: out std_logic; -- enable do lcd
 		LCD_RS: out std_logic; -- troca entre comando e digito
-		LCD_RW: out std_logic	-- rw (vai ser sempre 0)
+		LCD_RW: out std_logic;	-- rw (vai ser sempre 0)
+		READY: out std_logic -- pulso de READY
 	);
 end io_lcd_escrever;
 
@@ -45,6 +46,10 @@ architecture rtl of io_lcd_escrever is
 	signal reg_LCD_E, next_LCD_E: std_logic := '0';
 	signal reg_LCD_RS, next_LCD_RS: std_logic := '0';
 	
+	-- ALTERACAO: pulso de READY --
+	signal reg_ready, next_ready: std_logic := '0';
+	-- FIM DA ALTERACAO
+	
 	-- para setar o VI manualmente ao fazer a configuracao
 	signal vi_virtual: std_logic := '0';
 	
@@ -64,6 +69,10 @@ begin
 			reg_SF_D <= next_SF_D;
 			reg_LCD_E <= next_LCD_E;
 			reg_LCD_RS <= next_LCD_RS;
+			-- ALTERACAO: pulso de READY --
+			reg_ready <= next_ready;
+			-- FIM DA ALTERACAO --
+			
 		end if;
 	end process;
 	
@@ -132,6 +141,9 @@ begin
 		next_SF_D <= reg_SF_D;
 		next_LCD_E <= reg_LCD_E;
 		next_LCD_RS <= reg_LCD_RS;
+		-- ALTERACAO: pulso de READY --
+		next_ready <= reg_ready;
+		-- FIM DA ALTERACAO --
 				
 		case estado is
 			when Inicializacao =>
@@ -158,6 +170,10 @@ begin
 				
 			when DigParado =>
 				if vi_virtual = '1' then
+					-- ALTERACAO: pulso de READY --
+					next_ready <= '0';
+					-- FIM DA ALTERACAO --
+				
 					if reg_novodig = '1' then
 						next_SF_D <= reg_entrada(7 downto 4);	-- SD_F = entrada[parte1]
 					else
@@ -202,8 +218,11 @@ begin
 				end if;
 			
 			when DigLoop =>
+				-- ALTERACAO: pulso de READY --
+				next_ready <= '1';
+				-- FIM DA ALTERACAO
 				if reg_q >= 2000 then
-					if reg_ini = '1' then
+					if reg_ini = '1' then				
 						next_q <= 0;
 						if reg_i = 3 then
 							next_ini <= '0';
@@ -229,6 +248,7 @@ begin
 	LCD_RS <= reg_LCD_RS;
 	LCD_E <= reg_LCD_E;
 	SF_D <= reg_SF_D;
+	READY <= reg_ready;
 	
 end rtl;
 
