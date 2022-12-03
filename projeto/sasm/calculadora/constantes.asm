@@ -1,0 +1,21 @@
+.equ MEM_RESET,     0x00
+.equ MEM_TECLADO,   0x14
+.equ MEM_SEG,       0x18
+.equ MEM_LCD_CARACTER,  0x19
+.equ MEM_LCD_COMANDO,   0x1A
+
+.equ ASCII_0,  0x30 
+.equ ASCII_1,  0x31
+.equ ASCII_2,  0x32
+.equ ASCII_3,  0x33
+.equ ASCII_4,  0x34
+.equ ASCII_5,  0x35
+.equ ASCII_6,  0x36
+.equ ASCII_7,  0x37
+.equ ASCII_8,  0x38
+.equ ASCII_9,  0x39
+.equ ASCII_MAIS,  0x2B
+.equ ASCII_MENOS, 0x2D
+.equ ASCII_ENTER, 0x0A
+.equ ASCII_IGUAL, 0x3D
+.equ ASCII_BACK,  0x08
