@@ -108,7 +108,7 @@ architecture structural of processador is
 		);
 	end component;
 	
-	component io_lcd_escrever is
+	component io_lcd_driver is
 		port(
 			CLOCK: in std_logic;
 			VI: in std_logic;
@@ -264,7 +264,7 @@ begin
 		VO => ps2_memoria_vo
 	);
 	
-	inst_io_lcd_escrever: io_lcd_escrever port map (
+	inst_io_lcd_driver: io_lcd_driver port map (
 		CLOCK => CLK,
 		VI => memoria_lcd_enable,
 		BYTE_IN => memoria_lcd_dado,
