@@ -19,3 +19,4 @@
 .equ ASCII_ENTER, 0x0A
 .equ ASCII_IGUAL, 0x3D
 .equ ASCII_BACK,  0x08
+.equ ASCII_ERRO,  0x3F
