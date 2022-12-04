@@ -56,8 +56,8 @@ begin
 		if rising_edge(CLOCK) then
 			-- valores default
 			DADO_SAIDA <= (others => '0');
-			LCD_DADO <= (others => '0');
-			LCD_TIPO <= '0';
+			-- LCD_DADO <= (others => '0');
+			-- LCD_TIPO <= '0';
 			LCD_ENABLE <= '0';
 			
 			-- recebimento do teclado
@@ -65,25 +65,34 @@ begin
 				ram(byte_para_inteiro(END_PS2)) <= PS2_DADO;
 			end if;
 			
-			-- recebendo ready do lcd
-			if LCD_READY = '0' then
+			-- recebendo ready do lcd --> reinicia tudo
+			if LCD_READY = '1' then
+				LCD_DADO <= (others => '0');
+				LCD_TIPO <= '0';
 				ram(byte_para_inteiro(END_CARACTER)) <= (others => '0');
 				ram(byte_para_inteiro(END_COMANDO)) <= (others => '0');
 			end if;
 			
 			-- modo escrita
-			if READ_WRITE = MODO_WRITE and ENABLE = '1' then
-				-- sempre escreve na memoria
-				ram(byte_para_inteiro(ENDERECO)) <= DADO_ENTRADA;
-				
+			if READ_WRITE = MODO_WRITE then
+				-- deixa as saidas ja configuradas, mesmo o enable sendo 0
 				if ENDERECO = END_CARACTER then
-					LCD_ENABLE <= '1';
 					LCD_DADO <= DADO_ENTRADA;
 					LCD_TIPO <= T_CARACTER;
 				elsif ENDERECO = END_COMANDO then
-					LCD_ENABLE <= '1';
 					LCD_DADO <= DADO_ENTRADA;
 					LCD_TIPO <= T_COMANDO;
+				end if;
+				
+				-- escritas
+				if ENABLE = '1' then  
+					ram(byte_para_inteiro(ENDERECO)) <= DADO_ENTRADA;
+					
+					if ENDERECO = END_CARACTER then
+						LCD_ENABLE <= '1';
+					elsif ENDERECO = END_COMANDO then
+						LCD_ENABLE <= '1';
+					end if;
 				end if;
 		
 			elsif READ_WRITE = MODO_READ and ENABLE = '1' then -- modo leitura

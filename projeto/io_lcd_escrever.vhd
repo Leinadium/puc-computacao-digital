@@ -142,7 +142,7 @@ begin
 		next_LCD_E <= reg_LCD_E;
 		next_LCD_RS <= reg_LCD_RS;
 		-- ALTERACAO: pulso de READY --
-		next_ready <= reg_ready;
+		next_ready <= '0';
 		-- FIM DA ALTERACAO --
 				
 		case estado is
@@ -169,11 +169,7 @@ begin
 				end if;
 				
 			when DigParado =>
-				if vi_virtual = '1' then
-					-- ALTERACAO: pulso de READY --
-					next_ready <= '0';
-					-- FIM DA ALTERACAO --
-				
+				if vi_virtual = '1' then				
 					if reg_novodig = '1' then
 						next_SF_D <= reg_entrada(7 downto 4);	-- SD_F = entrada[parte1]
 					else
@@ -218,11 +214,11 @@ begin
 				end if;
 			
 			when DigLoop =>
-				-- ALTERACAO: pulso de READY --
-				next_ready <= '1';
-				-- FIM DA ALTERACAO
 				if reg_q >= 2000 then
-					if reg_ini = '1' then				
+					-- ALTERACAO: pulso de READY --
+					next_ready <= '1';
+					-- FIM DA ALTERACAO --
+					if reg_ini = '1' then					
 						next_q <= 0;
 						if reg_i = 3 then
 							next_ini <= '0';

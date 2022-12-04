@@ -38,8 +38,8 @@ ARCHITECTURE behavior OF teste_ps2 IS
 	type DataT is array (0 to 11) of std_logic_vector(7 downto 0);
 	constant DATA : DataT := (
 		x"45", "11110000", x"45", -- "0" + 0xF0 + "0"
-		x"16", "11110000", x"16", -- "1" + 0xF0 + "1"
-		x"1E", "11110000", x"1E", -- "2" + 0xF0 + "2"
+		x"55", "11110000", x"55", -- "+ + 0xF0 + "+"
+		x"5A", "11110000", x"5A", -- "ENTER" + 0xF0 + "ENTER"
 		x"26", "11110000", x"26"  -- "3" + 0xF0 + "3"
 	);
 
@@ -98,7 +98,7 @@ BEGIN
 			end loop ;
 			ps2_bit('0', PS2_CLK, PS2_DATA ) ; -- parity ( discard )
 			ps2_bit('1', PS2_CLK, PS2_DATA ) ; -- stop
-			wait for 10 ms ;
+			wait for 5 ms ;
 			end loop ;
 
       wait;
