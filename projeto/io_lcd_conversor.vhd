@@ -28,8 +28,8 @@ architecture rtl of io_lcd_conversor is
 		16#39# => x"39", -- 9 -> 9
 		16#2B# => x"2B", -- + -> +
 		16#2D# => x"2D", -- - -> -
-		16#0A# => x"3D", -- ENTER -> = 
-		others => x"2D"  -- [-] para teste
+		16#3D# => x"3D", -- = -> = 
+		others => x"3F"  -- [-] para teste
 	);
 begin
 	LCD_CODE <= MEM(to_integer(unsigned(ASCII))) when TIPO_IN = T_CARACTER 

@@ -19,9 +19,6 @@ end processador;
 architecture structural of processador is
 	component unidade_controle is
 		port(
-		
-			VAZA_END: out ByteT;
-		
 			CLOCK: in std_logic;
 			MEMORIA_END: out ByteT;     -- endereco do dado
 			MEMORIA_RW: out std_logic;  -- modo leitura ou escrita
@@ -170,9 +167,6 @@ begin
 	CLK <= CLK_50MHZ;
 
 	inst_unidade_controle: unidade_controle port map (
-		
-		-- VAZA_END => memoria_numero_7seg,
-	
 		ClOCK => CLK,
 		MEMORIA_IN => memoria_controle_saida,
 		MEMORIA_RW => controle_memoria_rw,

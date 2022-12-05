@@ -5,9 +5,6 @@ use work.pacote_processador.ALL;
 
 entity unidade_controle is
 	port(
-	
-		VAZA_END: out ByteT;
-	
 		CLOCK: in std_logic;
 		-- unidade load/store
 		MEMORIA_END: out ByteT;     -- endereco do dado
@@ -79,7 +76,10 @@ begin
 	end process;
 
 	-- ciclo da maquina de estados
-	process (estado_atual, pc_atual, cir_atual, ALU_IN, MEMORIA_IN) is
+	process (
+		estado_atual, pc_atual, cir_atual, ALU_IN, MEMORIA_IN,
+		sp_atual, flag_carry, flag_zero, ALU_FCARRY, ALU_FZERO
+	) is
 		variable instrucao: InstrucaoT;
 	begin
 		-- valores padrao
@@ -418,6 +418,7 @@ begin
 					when CI_INCC => REGISTRO_E <= '1';
 					when CI_DECB => REGISTRO_E <= '1';
 					when CI_ADD => REGISTRO_E <= '1';
+					when CI_SUB => REGISTRO_E <= '1';
 					-- when CI_CP => -- nao salva no registro
 					when CI_NEG => REGISTRO_E <= '1';
 					when CI_NOT => REGISTRO_E <= '1';
@@ -437,9 +438,5 @@ begin
 				estado_prox <= Fetch1; -- proximo estado
 		end case;
 	end process;
-	
-	
-	VAZA_END <= inteiro_para_byte(pc_atual);
-	
 end rtl;
 
