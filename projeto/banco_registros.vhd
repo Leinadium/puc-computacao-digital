@@ -20,7 +20,7 @@ architecture rtl of banco_registros is
 	type registrosT is array(0 to QUANTIDADE_REG-1) of ByteT;
 	signal registros: registrosT := (others => (others => '0'));
 	
-	signal indice_a, indice_b, indice_z: integer range 0 to MAX_REG := 0;
+	signal indice_a, indice_b, indice_z: integer range 0 to QUANTIDADE_REG-1 := 0;
 begin
 
 	indice_a <= ident_para_inteiro(RD);

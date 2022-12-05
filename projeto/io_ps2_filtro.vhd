@@ -11,7 +11,7 @@ entity io_ps2_filtro is
 	);
 end io_ps2_filtro;
 architecture rtl of io_ps2_filtro is
-	signal tecla_registro: std_logic_vector(7 downto 0) := (others => '0');
+	-- signal tecla_registro: std_logic_vector(7 downto 0) := (others => '0');
 	signal tecla_quantidade: integer range 0 to 8 := 0;
 begin
 	process (CLOCK, VI) is

@@ -160,10 +160,7 @@ architecture structural of processador is
 	signal lcd_memoria_ready: std_logic;
 	
 begin
-	-- inst_divisor: divisor port map(
-	--	CLOCK_IN => CLK_50MHZ,
-	--	CLOCK_OUT => CLK
-	--);
+	--inst_divisor: divisor port map(CLOCK_IN => CLK_50MHZ, CLOCK_OUT => CLK);
 	CLK <= CLK_50MHZ;
 
 	inst_unidade_controle: unidade_controle port map (
@@ -245,7 +242,8 @@ begin
 	
 	inst_io_displayseg_exibicao: io_displayseg_exibicao port map (
 		CLOCK => CLK_50MHZ,
-		NUMERO => memoria_numero_7seg,
+		-- NUMERO => memoria_numero_7seg,
+		NUMERO => controle_multiplexador_endereco,
 		SAIDA_J1 => SAIDA_J1, 
 		SAIDA_J2 => SAIDA_J2
 	);
