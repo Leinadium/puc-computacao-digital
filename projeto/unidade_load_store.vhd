@@ -26,6 +26,7 @@ end unidade_load_store;
 
 architecture rtl of unidade_load_store is
 	type ramT is array(0 to MEM_SIZE-1) of ByteT;
+	 
 	 -- calculadora
   signal ram: ramT := (
       0 => "11110000", -- calculadora.asm:  4:                                jmp @main
@@ -85,7 +86,7 @@ architecture rtl of unidade_load_store is
      84 => "00110110", --
      85 => "00111000", -- calculadora.asm: 87:                                mov  r2, r0
      86 => "00001100", -- calculadora.asm: 89:                                ldi  r3, @terceira_tecla
-     87 => "01011011", --
+     87 => "01011011", -- 
      88 => "00001101", -- calculadora.asm: 90:                                push r3
      89 => "11110000", -- calculadora.asm: 91:                                jmp  @get_tecla
      90 => "00110110", --
@@ -134,7 +135,7 @@ architecture rtl of unidade_load_store is
     133 => "00000001", -- calculadora.asm:147:                                push r0
     134 => "00000000", -- calculadora.asm:148:                                ldi  r0, @ascii_1
     135 => "00110001", --
-    136 => "00001100", -- calculadora.asm:149:                                ldi  r3, @pos_resultado_primeiro_digito   
+    136 => "00001100", -- calculadora.asm:149:                                ldi  r3, @pos_resultado_primeiro_digito
     137 => "10001101", --
     138 => "00001101", -- calculadora.asm:150:                                push r3
     139 => "11110000", -- calculadora.asm:151:                                jmp  @escreve_lcd

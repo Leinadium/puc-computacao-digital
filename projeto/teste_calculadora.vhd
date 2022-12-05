@@ -26,7 +26,6 @@ ARCHITECTURE behavior OF teste_calculadora IS
    signal PS2_DATA : std_logic := '0';
 
  	--Outputs
-	signal VAZA_END : std_logic_vector(7 downto 0);
    signal SAIDA_J1 : std_logic_vector(3 downto 0);
    signal SAIDA_J2 : std_logic_vector(3 downto 0);
 	signal SF_D: std_logic_vector(3 downto 0);

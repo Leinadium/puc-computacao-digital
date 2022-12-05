@@ -242,8 +242,8 @@ begin
 	
 	inst_io_displayseg_exibicao: io_displayseg_exibicao port map (
 		CLOCK => CLK_50MHZ,
-		-- NUMERO => memoria_numero_7seg,
-		NUMERO => controle_multiplexador_endereco,
+		NUMERO => memoria_numero_7seg,
+		-- NUMERO => controle_multiplexador_endereco,
 		SAIDA_J1 => SAIDA_J1, 
 		SAIDA_J2 => SAIDA_J2
 	);
